@@ -16,8 +16,8 @@ type AuthConfig struct {
 }
 
 type MessagingEngineConfig struct {
-	SvcHost        string     `json:"svc_host"`
-	SvcPort        int        `json:"svc_port"`
+	Host           string     `json:"host"`
+	Port           int        `json:"port"`
 	AllowedOrigins string     `json:"allowed_origins"` // comma seperated origins
 	Auth           AuthConfig `json:"auth"`
 }
