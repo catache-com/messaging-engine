@@ -19,7 +19,9 @@ func NewClientPool() *ClientPool {
 	}
 }
 
-func (ClientPool *ClientPool) Start() error {
+func (ClientPool *ClientPool) Start(wg *sync.WaitGroup) {
+	defer wg.Done() // Decrement the counter when the function returns
+
 	for {
 		select {
 		case client := <-ClientPool.Register:
