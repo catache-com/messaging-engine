@@ -16,8 +16,6 @@ type Routes []Route
 
 var MessagingEngineProtectedRoutes = Routes{}
 
-var MessagingEngineApiRoutes = Routes{}
-
 var MessagingEngineOpenRoutes = Routes{
 	// ---------- probing ----------
 	Route{
@@ -40,5 +38,47 @@ var MessagingEngineOpenRoutes = Routes{
 		Method:      "GET",
 		Pattern:     "/connect",
 		HandlerFunc: AcceptConnection,
+	},
+
+	Route{
+		Name:        "send message to a client",
+		Method:      "POST",
+		Pattern:     "/client/send",
+		HandlerFunc: HandleSendMessageToClient,
+	},
+
+	Route{
+		Name:        "send message to a client",
+		Method:      "POST",
+		Pattern:     "/clients/send",
+		HandlerFunc: HandleSendMessageToClients,
+	},
+
+	Route{
+		Name:        "find messages in a channel",
+		Method:      "GET",
+		Pattern:     "/messages/channel",
+		HandlerFunc: HandleGetChannelMessages,
+	},
+
+	Route{
+		Name:        "find messages in a channel",
+		Method:      "GET",
+		Pattern:     "/messages/thread",
+		HandlerFunc: HandleGetThreadMessages,
+	},
+
+	Route{
+		Name:        "initialise a new channel",
+		Method:      "POST",
+		Pattern:     "/channel/new",
+		HandlerFunc: HandleMakeNewChannel,
+	},
+
+	Route{
+		Name:        "initialise a new thread",
+		Method:      "POST",
+		Pattern:     "/thread/new",
+		HandlerFunc: HandleMakeNewThread,
 	},
 }
