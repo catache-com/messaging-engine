@@ -48,13 +48,6 @@ var MessagingEngineOpenRoutes = Routes{
 	},
 
 	Route{
-		Name:        "send message to a client",
-		Method:      "POST",
-		Pattern:     "/clients/send",
-		HandlerFunc: HandleSendMessageToClients,
-	},
-
-	Route{
 		Name:        "find messages in a channel",
 		Method:      "GET",
 		Pattern:     "/messages/channel",

@@ -13,7 +13,7 @@ type File struct {
 // Message this is the messages sending to messaging-engine, not exactly user communicated messages
 type Message struct {
 	Type    string                 `json:"type"    mapstructure:"type"`
-	SendTo  []string               `json:"send_to" mapstructure:"send_to"`
+	SendTo  string                 `json:"send_to" mapstructure:"send_to"`
 	Payload map[string]interface{} `json:"payload" mapstructure:"payload"`
 }
 

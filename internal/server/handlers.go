@@ -68,31 +68,13 @@ func HandleSendMessageToClient(w http.ResponseWriter, r *http.Request) {
 			return
 		} else {
 			// ready to send to another end client
-			ClientPool.SendMsgToClients([]string{clientId}, g.Message)
+			ClientPool.Messages <- g.Message
 			util.WriteJSONResponse(w, http.StatusOK, []byte("OK"))
 			return
 		}
 	}
 
 	util.WriteJSONResponse(w, http.StatusAccepted, []byte("Client not online."))
-}
-
-func HandleSendMessageToClients(w http.ResponseWriter, r *http.Request) {
-	type got struct {
-		ClientIds []string       `json:"client_ids"`
-		Message   models.Message `json:"message"`
-	}
-
-	var g got
-	err := util.DecodeJSONBody(w, r, &g)
-	if err != nil {
-		logrus.Errorf("error decoding JSON body when HandleSendMessageToClient, %v", err)
-		util.WriteJSONResponse(w, http.StatusBadRequest, []byte("error"))
-		return
-	}
-
-	ClientPool.SendMsgToClients(g.ClientIds, g.Message)
-	util.WriteJSONResponse(w, http.StatusOK, []byte("OK"))
 }
 
 func HandleGetChannelMessages(w http.ResponseWriter, r *http.Request) {

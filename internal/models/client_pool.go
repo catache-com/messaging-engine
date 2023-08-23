@@ -8,6 +8,7 @@ import (
 type ClientPool struct {
 	Register   chan *Client
 	Unregister chan *Client
+	Messages   chan Message
 	Clients    map[string]*Client
 }
 
@@ -29,6 +30,9 @@ func (ClientPool *ClientPool) Start(wg *sync.WaitGroup) {
 			break
 		case client := <-ClientPool.Unregister:
 			delete(ClientPool.Clients, client.ID)
+			break
+		case message := <-ClientPool.Messages:
+			ClientPool.SendMsgToClient(message)
 		}
 	}
 }
@@ -41,23 +45,11 @@ func (ClientPool *ClientPool) GetTheClient(clientId string) *Client {
 	return nil
 }
 
-func (ClientPool *ClientPool) SendMsgToClients(clientIds []string, message Message) {
-	var wg sync.WaitGroup
-
-	for _, id := range clientIds {
-		wg.Add(1)
-
-		go func(id string) {
-			defer wg.Done()
-
-			foundClient := ClientPool.Clients[id]
-			if foundClient != nil {
-				foundClient.Write(message)
-			}
-		}(id)
+func (ClientPool *ClientPool) SendMsgToClient(message Message) {
+	foundClient := ClientPool.Clients[message.SendTo]
+	if foundClient != nil {
+		foundClient.Write(message)
 	}
-
-	wg.Wait()
 }
 
 func (ClientPool *ClientPool) ClientExitFromPool(clientId string) {
