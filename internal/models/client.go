@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
+	"sync"
 )
 
 type Client struct {
@@ -11,6 +12,22 @@ type Client struct {
 	Conn              *websocket.Conn
 	ClientPool        *ClientPool
 	HandleMessageFunc func(message Message) error
+	readMu            sync.Mutex
+	writeMu           sync.Mutex
+}
+
+func (c *Client) safeRead() (int, []byte, error) {
+	c.readMu.Lock()
+	defer c.readMu.Unlock()
+
+	return c.Conn.ReadMessage()
+}
+
+func (c *Client) SafeWriteJson(message Message) error {
+	c.writeMu.Lock()
+	defer c.writeMu.Unlock()
+
+	return c.Conn.WriteJSON(message)
 }
 
 func (c *Client) Read() {
@@ -24,7 +41,7 @@ func (c *Client) Read() {
 	}()
 
 	for {
-		_, m, err := c.Conn.ReadMessage()
+		_, m, err := c.safeRead()
 		if err != nil {
 			logrus.Debugf("client connection error reading message for %s: %v", c.ID, err)
 			return
@@ -48,7 +65,7 @@ func (c *Client) Read() {
 }
 
 func (c *Client) Write(message Message) {
-	if err := c.Conn.WriteJSON(message); err != nil {
+	if err := c.SafeWriteJson(message); err != nil {
 		logrus.Errorf("failed to write to client %s: %v", c.ID, err)
 	}
 }
@@ -64,5 +81,10 @@ func NewClient(
 	HandleMessageFunc func(message Message) error,
 ) *Client {
 	logrus.Infof("creating client %s", clientId)
-	return &Client{clientId, conn, ClientPool, HandleMessageFunc}
+	return &Client{
+		ID:                clientId,
+		Conn:              conn,
+		ClientPool:        ClientPool,
+		HandleMessageFunc: HandleMessageFunc,
+	}
 }
