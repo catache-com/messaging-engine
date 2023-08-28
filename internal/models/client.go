@@ -58,7 +58,7 @@ func (c *Client) Read() {
 			// we only proceed sending to other clients once it's processed
 			if err == nil {
 				// ready to send to another end client
-				c.ClientPool.Messages <- message
+				c.ClientPool.SendMsgToClient(message)
 			}
 		}
 	}

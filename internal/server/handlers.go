@@ -68,7 +68,7 @@ func HandleSendMessageToClient(w http.ResponseWriter, r *http.Request) {
 			return
 		} else {
 			// ready to send to another end client
-			ClientPool.Messages <- g.Message
+			ClientPool.SendMsgToClient(g.Message)
 			util.WriteJSONResponse(w, http.StatusOK, []byte("OK"))
 			return
 		}
